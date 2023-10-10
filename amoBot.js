@@ -50,14 +50,13 @@ bot.on("message", async (msg) => {
     } else {
       await bot.sendMessage(
         chatId,
-        `Твой запрос неправильный, проверь еще раз. Он должен включать в себя все строчки из шаблона, пункты можно оставлять не заполненными`
+        `Твой запрос неправильный, проверь еще раз. Он должен включать в себя все строчки из шаблона, пункты можно оставлять не заполненными (кроме полей founder name, company name, about company и web - они обязательные)`
       );
 
       await bot.sendMessage(chatId, `${messageTemplate}`, {
         parse_mode: "Markdown",
       });
     }
-
   } else {
     await bot.sendMessage(
       chatId,
@@ -77,11 +76,11 @@ bot.on("message", async (msg) => {
 function parseMessage(message) {
   const lines = message.split("\n");
   try {
-    const founder = lines[0].replace("founder name: ", "");
+    const founder = lines[0].replace("founder name: ", ""); // обязательное
     const aboutFounder = lines[1].replace("about founder: ", "");
-    const companyName = lines[2].replace("company name: ", "");
-    const aboutCompany = lines[3].replace("about company: ", "");
-    const web = lines[4].replace("web: ", "");
+    const companyName = lines[2].replace("company name: ", ""); // обязательное
+    const aboutCompany = lines[3].replace("about company: ", ""); // обязательное
+    const web = lines[4].replace("web: ", ""); // обязательное
     const tg = lines[5].replace("TG: ", "");
     const ld = lines[6].replace("link LD: ", "");
     const position = lines[7].replace("founder position: ", "");
@@ -105,6 +104,20 @@ function parseMessage(message) {
     );
     const inst = lines[17].replace("inst: ", "");
     const whereFrom = lines[18].replace("📍 ", "");
+
+    if (
+      founder.length === 0 ||
+      companyName.length === 0 ||
+      aboutCompany.length === 0 ||
+      web.length === 0
+    ) {
+      return {
+        isSuccess: false,
+        companyData: {},
+        contactData: {},
+        leadData: {},
+      };
+    }
 
     const companyData = {
       name: companyName,
